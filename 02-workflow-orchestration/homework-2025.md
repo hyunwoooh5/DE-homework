@@ -21,11 +21,11 @@ How many rows are there for the `Yellow` Taxi data for all CSV files in the year
 
 
 ```sql
-SELECT * FROM public.yellow_tripdata
-WHERE tpep_pickup_datetime >= '2020-01-01' AND tpep_pickup_datetime < '2021-01-01'
+SELECT count(*) FROM public.yellow_tripdata 
+WHERE filename like 'yellow_tripdata_2020-%';
 ```
 
-Answer: `24648482`
+Answer: `24648499`
 
 
 
