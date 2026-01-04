@@ -4,6 +4,8 @@
     )
 }}
 
+-- Combine yellow and green trip data
+
 with green_tripdata as (
     select *, 
         'Green' as service_type

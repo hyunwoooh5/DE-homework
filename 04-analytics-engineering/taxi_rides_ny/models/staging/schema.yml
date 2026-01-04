@@ -1,9 +1,13 @@
 version: 2
 
-sources:
+sources: # Raw data sources
   - name: staging
-    database: "{{ env_var('DBT_DATABASE', 'taxi-rides-ny-339813-412521') }}"
-    schema: "{{ env_var('DBT_SCHEMA', 'trips_data_all') }}"
+
+    # Project ID
+    database: "{{ env_var('DBT_DATABASE', 'project-93b82bcf-bce9-4928-82e') }}"
+
+    # Dataset name
+    schema: "{{ env_var('DBT_SCHEMA', 'zoomcamp') }}"
       # loaded_at_field: record_loaded_at
     tables:
       - name: green_tripdata

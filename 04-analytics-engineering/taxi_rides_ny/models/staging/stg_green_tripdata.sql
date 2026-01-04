@@ -1,3 +1,5 @@
+-- Transform and materialize data from a source table
+
 {{
     config(
         materialized='view'
@@ -7,21 +9,23 @@
 with tripdata as 
 (
   select *,
-    row_number() over(partition by vendorid, lpep_pickup_datetime) as rn
+    row_number() over(partition by vendorid, lpep_pickup_datetime) as rn -- Deduplication
   from {{ source('staging','green_tripdata') }}
   where vendorid is not null 
 )
 select
     -- identifiers
-    {{ dbt_utils.generate_surrogate_key(['vendorid', 'lpep_pickup_datetime']) }} as tripid,
+    {{ dbt_utils.generate_surrogate_key(['vendorid', 'lpep_pickup_datetime']) }} as tripid, -- Unique surrogate key
     {{ dbt.safe_cast("vendorid", api.Column.translate_type("integer")) }} as vendorid,
     {{ dbt.safe_cast("ratecodeid", api.Column.translate_type("integer")) }} as ratecodeid,
     {{ dbt.safe_cast("pulocationid", api.Column.translate_type("integer")) }} as pickup_locationid,
     {{ dbt.safe_cast("dolocationid", api.Column.translate_type("integer")) }} as dropoff_locationid,
     
     -- timestamps
-    cast(lpep_pickup_datetime as timestamp) as pickup_datetime,
-    cast(lpep_dropoff_datetime as timestamp) as dropoff_datetime,
+    -- cast(lpep_pickup_datetime as timestamp) as pickup_datetime,
+    -- cast(lpep_dropoff_datetime as timestamp) as dropoff_datetime,    
+    timestamp_micros(cast(lpep_pickup_datetime / 1000 as int64)) as pickup_datetime,
+    timestamp_micros(cast(lpep_dropoff_datetime / 1000 as int64)) as dropoff_datetime,
     
     -- trip info
     store_and_fwd_flag,
@@ -41,7 +45,7 @@ select
     coalesce({{ dbt.safe_cast("payment_type", api.Column.translate_type("integer")) }},0) as payment_type,
     {{ get_payment_type_description("payment_type") }} as payment_type_description
 from tripdata
-where rn = 1
+where rn = 1 -- Deduplication
 
 
 -- dbt build --select <model_name> --vars '{'is_test_run': 'false'}'

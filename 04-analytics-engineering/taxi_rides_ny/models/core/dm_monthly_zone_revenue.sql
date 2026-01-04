@@ -1,5 +1,7 @@
 {{ config(materialized='table') }}
 
+-- create a table with monthly revenue metrics per pickup zone and service type
+
 with trips_data as (
     select * from {{ ref('fact_trips') }}
 )

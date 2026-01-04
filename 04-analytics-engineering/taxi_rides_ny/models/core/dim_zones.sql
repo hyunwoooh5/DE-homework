@@ -1,5 +1,7 @@
 {{ config(materialized='table') }}
 
+-- Master data table containing all the zone information
+
 select 
     locationid, 
     borough, 
