@@ -31,6 +31,7 @@ def upload_to_gcs(bucket, object_name, local_file):
     blob = bucket.blob(object_name)
     blob.upload_from_filename(local_file)
 
+
 '''
 def web_to_gcs(year, service):
     for i in range(12):
@@ -59,6 +60,7 @@ def web_to_gcs(year, service):
         print(f"GCS: {service}/{file_name}")
 '''
 
+
 def web_to_gcs(year, service):
     # Schema Enforcement
     # pd.Int64Dtype() forces Int64 even if there is NaN
@@ -83,6 +85,13 @@ def web_to_gcs(year, service):
         # --- Green Taxi Only ---
         'trip_type': pd.Int64Dtype(),
         'ehail_fee': float,
+
+        # --- FHV only ---
+        'PUlocationID': pd.Int64Dtype(),
+        'DOlocationID': pd.Int64Dtype(),
+        'dispatching_base_num': str,
+        'SR_Flag': float,
+        'Affiliated_base_number': str
     }
 
     # Date columns
@@ -98,22 +107,21 @@ def web_to_gcs(year, service):
     for i in range(12):
         month = '0'+str(i+1)
         month = month[-2:]
-        
+
         file_name = f"{service}_tripdata_{year}-{month}.csv.gz"
         request_url = f"{init_url}{service}/{file_name}"
-        
+
         print(f"Downloading {file_name}...")
         r = requests.get(request_url)
         open(file_name, 'wb').write(r.content)
-        
+
         try:
             df = pd.read_csv(
-                file_name, 
-                compression='gzip', 
+                file_name,
+                compression='gzip',
                 dtype=taxi_dtypes,      # force type
-                parse_dates=parse_dates # force date
+                parse_dates=parse_dates  # force date
             )
-            
 
             parquet_file = file_name.replace('.csv.gz', '.parquet')
             df.to_parquet(parquet_file, engine='pyarrow')
@@ -121,10 +129,10 @@ def web_to_gcs(year, service):
 
             upload_to_gcs(BUCKET, f"{service}/{parquet_file}", parquet_file)
             print(f"Uploaded to GCS: {service}/{parquet_file}")
-            
+
         except Exception as e:
             print(f"Error processing {file_name}: {e}")
-        
+
 
 web_to_gcs('2019', 'fhv')
 
@@ -133,4 +141,3 @@ web_to_gcs('2020', 'green')
 
 web_to_gcs('2019', 'yellow')
 web_to_gcs('2020', 'yellow')
-
