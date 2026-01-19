@@ -3,3 +3,6 @@ __pycache__
 lecture/
 data/
 gcs.json
+
+*.csv
+*.parquet
