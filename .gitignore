@@ -6,3 +6,4 @@ gcs.json
 
 *.csv
 *.parquet
+*.duckdb
