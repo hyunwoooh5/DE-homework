@@ -11,7 +11,7 @@ import time
 BUCKET_NAME = "dezoomcamp_hw3_2025_hyunwoo"
 
 # If you authenticated through the GCP SDK you can comment out these two lines
-CREDENTIALS_FILE = "gcs.json"
+CREDENTIALS_FILE = os.path.expanduser("~/.credentials/DE-Zoomcamp/gcs.json")
 client = storage.Client.from_service_account_json(CREDENTIALS_FILE)
 # If commented initialize client with the following
 # client = storage.Client(project='zoomcamp-mod3-datawarehouse')
