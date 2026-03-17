@@ -3,6 +3,8 @@ __pycache__
 lecture/
 data/
 gcs.json
+yellow/
+green_tripdata*
 
 *.csv
 *.parquet
